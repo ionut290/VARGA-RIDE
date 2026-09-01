@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111813" />
+    <meta name="description" content="Percorsi, community e navigazione per enduro, motocross e moto su strada." />
+    <title>Varga Ride</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="vendor/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <header class="topbar">
+        <button class="brand" data-view="explore" aria-label="Apri la mappa">
+          <span class="brand-mark" aria-hidden="true">VR</span>
+          <span><strong>VARGA RIDE</strong><small>Ride beyond roads</small></span>
+        </button>
+        <div class="top-actions">
+          <button id="weatherButton" class="icon-button weather" aria-label="Condizioni meteo"><span>18°</span>☀</button>
+          <button id="alertsButton" class="icon-button" aria-label="Segnalazioni"><span class="alert-dot"></span>⚠</button>
+          <button class="avatar-button" data-view="profile" aria-label="Profilo">CV</button>
+        </div>
+      </header>
+
+      <main id="mainContent">
+        <section id="exploreView" class="view active" aria-labelledby="exploreTitle">
+          <div class="map-stage">
+            <div id="map" aria-label="Mappa dei percorsi"></div>
+            <div class="map-gradient"></div>
+
+            <div class="map-top-controls">
+              <div class="search-box">
+                <span aria-hidden="true">⌕</span>
+                <input id="mapSearch" type="search" placeholder="Cerca luogo o percorso" autocomplete="off" />
+                <button id="searchClear" class="clear-input" aria-label="Cancella ricerca">×</button>
+              </div>
+              <div id="modeChips" class="mode-chips" role="group" aria-label="Tipo di percorso">
+                <button class="chip active" data-mode="all">Tutti</button>
+                <button class="chip" data-mode="enduro">Enduro</button>
+                <button class="chip" data-mode="road">Strada</button>
+                <button class="chip" data-mode="motocross">Motocross</button>
+              </div>
+            </div>
+
+            <div class="map-side-controls">
+              <button id="layersButton" class="map-button" aria-label="Cambia mappa">MAP</button>
+              <button id="locateButton" class="map-button primary" aria-label="Mostra la mia posizione">GPS</button>
+            </div>
+
+            <div class="quick-card glass-card">
+              <div>
+                <span class="eyebrow">PRONTO A PARTIRE?</span>
+                <strong>Crea il giro perfetto</strong>
+                <small>Distanza, fondo e difficoltà su misura</small>
+              </div>
+              <button id="openGenerator" class="round-action" aria-label="Crea percorso">+</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="routesView" class="view page-view" aria-labelledby="routesTitle">
+          <div class="page-heading">
+            <span class="eyebrow">LA TUA OFFICINA DEI PERCORSI</span>
+            <h1 id="routesTitle">Crea un giro</h1>
+            <p>Scegli come vuoi guidare. Il percorso viene calcolato sulle strade e tracce presenti nei dati cartografici.</p>
+          </div>
+          <form id="routeForm" class="route-builder card">
+            <fieldset>
+              <legend>Tipo di uscita</legend>
+              <div class="segmented three">
+                <label><input type="radio" name="rideMode" value="enduro" checked /><span>Enduro</span></label>
+                <label><input type="radio" name="rideMode" value="road" /><span>Strada</span></label>
+                <label><input type="radio" name="rideMode" value="motocross" /><span>Motocross</span></label>
+              </div>
+            </fieldset>
+            <div class="form-grid two">
+              <label class="field"><span>Partenza</span><select id="startSource"><option value="gps">La mia posizione</option><option value="bologna">Bologna – centro mappa</option><option value="map">Punto scelto sulla mappa</option></select></label>
+              <label class="field"><span>Tipo percorso</span><select id="routeKind"><option value="loop">Giro ad anello</option><option value="oneway">Andata</option></select></label>
+            </div>
+            <label class="range-field"><span><b>Distanza desiderata</b><output id="distanceOutput">60 km</output></span><input id="distanceRange" type="range" min="10" max="250" step="5" value="60" /></label>
+            <label class="range-field"><span><b>Preferenza sterrato</b><output id="trailOutput">70%</output></span><input id="trailRange" type="range" min="0" max="100" step="10" value="70" /></label>
+            <fieldset>
+              <legend>Difficoltà</legend>
+              <div class="segmented">
+                <label><input type="radio" name="difficulty" value="easy" /><span>Facile</span></label>
+                <label><input type="radio" name="difficulty" value="medium" checked /><span>Media</span></label>
+                <label><input type="radio" name="difficulty" value="hard" /><span>Esperto</span></label>
+              </div>
+            </fieldset>
+            <div class="switch-list">
+              <label><span><b>Evita autostrade</b><small>Preferisce strade secondarie</small></span><input id="avoidHighways" type="checkbox" checked /></label>
+              <label><span><b>Evita pedaggi</b><small>Quando esiste un'alternativa</small></span><input id="avoidTolls" type="checkbox" checked /></label>
+              <label><span><b>Percorso panoramico</b><small>Favorisce strade secondarie e montagna</small></span><input id="scenicRoute" type="checkbox" checked /></label>
+            </div>
+            <button id="generateRoute" class="primary-button" type="submit"><span class="button-label">GENERA PERCORSO</span><span class="button-loader" aria-hidden="true"></span></button>
+            <p class="legal-note">L’app evita i tratti indicati come vietati o privati, ma i dati possono essere incompleti. Verifica sempre segnaletica e ordinanze locali.</p>
+          </form>
+          <div id="generatedRoute" class="generated-route hidden" aria-live="polite"></div>
+        </section>
+
+        <section id="communityView" class="view page-view" aria-labelledby="communityTitle">
+          <div class="page-heading row-heading">
+            <div><span class="eyebrow">SCOPRI · GUIDA · CONDIVIDI</span><h1 id="communityTitle">Community</h1></div>
+            <button id="publishButton" class="secondary-button">+ PUBBLICA</button>
+          </div>
+          <div class="community-tabs"><button class="active" data-feed="nearby">Vicino a te</button><button data-feed="popular">Popolari</button><button data-feed="following">Seguiti</button></div>
+          <div id="communityFeed" class="route-feed"></div>
+        </section>
+
+        <section id="recordView" class="view page-view record-page" aria-labelledby="recordTitle">
+          <div class="page-heading centered"><span class="eyebrow">TRACCIA LIBERA</span><h1 id="recordTitle">Registra il tuo giro</h1><p>Parti senza un percorso e trasforma la traccia GPS in un itinerario da salvare o pubblicare.</p></div>
+          <div class="record-dashboard card">
+            <div class="record-status"><span id="recordPulse" class="record-pulse"></span><span id="recordState">Pronto</span></div>
+            <div class="record-stats">
+              <div><strong id="recordTime">00:00:00</strong><span>Tempo</span></div>
+              <div><strong id="recordDistance">0,0</strong><span>km</span></div>
+              <div><strong id="recordSpeed">0</strong><span>km/h</span></div>
+              <div><strong id="recordAltitude">—</strong><span>Altitudine</span></div>
+            </div>
+            <button id="recordButton" class="record-button" type="button"><span>●</span> INIZIA REGISTRAZIONE</button>
+            <button id="finishRecordButton" class="secondary-button full hidden" type="button">TERMINA E SALVA</button>
+            <p class="permission-hint">Il GPS ad alta precisione verrà richiesto solo quando inizi.</p>
+          </div>
+          <div id="recordHistory" class="history-list"></div>
+        </section>
+
+        <section id="profileView" class="view page-view" aria-labelledby="profileTitle">
+          <div class="profile-hero">
+            <div class="profile-avatar">CV</div>
+            <div><span class="eyebrow">RIDER</span><h1 id="profileTitle">Cris Varga</h1><p>Bologna · Livello intermedio</p></div>
+            <button id="editProfile" class="icon-button" aria-label="Modifica profilo">✎</button>
+          </div>
+          <div class="profile-stats card"><div><strong id="profileKm">0</strong><span>km registrati</span></div><div><strong id="profileRoutes">0</strong><span>percorsi</span></div><div><strong>0</strong><span>pubblicati</span></div></div>
+          <div class="profile-menu card">
+            <button data-action="saved">♡ <span><b>Percorsi salvati</b><small>I tuoi preferiti e download offline</small></span><i>›</i></button>
+            <button data-action="garage">♢ <span><b>Il mio garage</b><small>Moto, autonomia e preferenze</small></span><i>›</i></button>
+            <button data-action="downloads">⇩ <span><b>Mappe offline</b><small>Gestisci le aree scaricate</small></span><i>›</i></button>
+            <button data-action="settings">⚙ <span><b>Impostazioni</b><small>Voce, unità, privacy e sicurezza</small></span><i>›</i></button>
+          </div>
+        </section>
+
+        <section id="navigationView" class="view navigation-view" aria-label="Navigazione attiva">
+          <div id="navigationMap" class="navigation-map"></div>
+          <div class="nav-instruction">
+            <span id="maneuverIcon" class="maneuver-icon">↑</span>
+            <div><strong id="maneuverDistance">Partenza</strong><span id="maneuverText">Segui il percorso</span></div>
+            <button id="muteNav" aria-label="Disattiva voce">ON</button>
+          </div>
+          <div id="offRouteWarning" class="off-route hidden"><b>Sei fuori percorso</b><button id="rerouteButton">CALCOLA ALTERNATIVA</button></div>
+          <div class="nav-bottom-panel">
+            <div class="nav-metrics"><div><strong id="navEta">—</strong><span>arrivo</span></div><div><strong id="navRemaining">—</strong><span>km</span></div><div><strong id="navDuration">—</strong><span>min</span></div><div><strong id="navSpeed">0</strong><span>km/h</span></div></div>
+            <div class="nav-actions"><button id="navOverview">MAP<span>Panoramica</span></button><button id="navCenter" class="primary">GPS<span>Centra</span></button><button id="navSos" class="danger">SOS<span>Aiuto</span></button><button id="endNavigation">STOP<span>Termina</span></button></div>
+          </div>
+        </section>
+      </main>
+
+      <nav id="bottomNav" class="bottom-nav" aria-label="Navigazione principale">
+        <button class="active" data-view="explore"><span>MAP</span>Esplora</button>
+        <button data-view="routes"><span>GO</span>Crea</button>
+        <button class="record-nav" data-view="record"><span>●</span>Registra</button>
+        <button data-view="community"><span>2+</span>Community</button>
+        <button data-view="profile"><span>ME</span>Profilo</button>
+      </nav>
+    </div>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <dialog id="routeDetailDialog" class="sheet-dialog">
+      <button class="close-sheet" data-close-dialog aria-label="Chiudi">×</button>
+      <div id="routeDetailContent"></div>
+    </dialog>
+
+    <dialog id="publishDialog" class="sheet-dialog compact-dialog">
+      <button class="close-sheet" data-close-dialog aria-label="Chiudi">×</button>
+      <form id="publishForm" method="dialog">
+        <span class="eyebrow">CONDIVIDI CON LA COMMUNITY</span><h2>Pubblica un percorso</h2>
+        <label class="field"><span>Titolo</span><input name="title" required maxlength="60" placeholder="Es. Colline bolognesi al tramonto" /></label>
+        <label class="field"><span>Descrizione</span><textarea name="description" rows="3" maxlength="300" placeholder="Fondo, passaggi difficili e punti utili"></textarea></label>
+        <label class="field"><span>Visibilità</span><select name="visibility"><option value="public">Pubblico</option><option value="followers">Solo follower</option><option value="private">Privato</option></select></label>
+        <button class="primary-button" type="submit">PUBBLICA</button>
+      </form>
+    </dialog>
+
+    <script src="vendor/leaflet.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

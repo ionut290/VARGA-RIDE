@@ -1,0 +1,13 @@
+{
+  "name": "Varga Ride",
+  "short_name": "Varga Ride",
+  "description": "Percorsi e navigazione per enduro, motocross e moto su strada.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d120f",
+  "theme_color": "#111813",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

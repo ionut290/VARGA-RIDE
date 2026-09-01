@@ -1,0 +1,19 @@
+{
+  "name": "varga-ride",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PWA per enduro, motocross e itinerari motociclistici con navigazione integrata.",
+  "scripts": {
+    "serve": "npx serve . -l 4173",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check app.js && node --check netlify/functions/route.mjs && npm test"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "serve": "14.2.4"
+  }
+}
