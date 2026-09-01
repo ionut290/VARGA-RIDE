@@ -80,6 +80,7 @@
               <label class="field"><span>Partenza</span><select id="startSource"><option value="gps">La mia posizione</option><option value="bologna">Bologna – centro mappa</option><option value="map">Punto scelto sulla mappa</option></select></label>
               <label class="field"><span>Tipo percorso</span><select id="routeKind"><option value="loop">Giro ad anello</option><option value="oneway">Andata</option></select></label>
             </div>
+            <label class="field"><span>Motore del percorso</span><select id="routeProvider"><option value="auto">Automatico – usa il migliore disponibile</option><option value="graphhopper">GraphHopper – sterrato personalizzato</option><option value="valhalla">OpenStreetMap – moto e sentieri</option></select><small class="field-hint">Se un servizio non risponde, VARGA RIDE passa automaticamente al motore OpenStreetMap.</small></label>
             <label class="range-field"><span><b>Distanza desiderata</b><output id="distanceOutput">60 km</output></span><input id="distanceRange" type="range" min="10" max="250" step="5" value="60" /></label>
             <label class="range-field"><span><b>Preferenza sterrato</b><output id="trailOutput">70%</output></span><input id="trailRange" type="range" min="0" max="100" step="10" value="70" /></label>
             <fieldset>

@@ -5,7 +5,8 @@ Prima versione della PWA pubblica per enduro, sterrato, moto su strada e circuit
 ## Funzioni già incluse
 
 - mappa mobile con modalità stradale e topografica;
-- generatore di percorsi motociclistici con profilo strada/adventure;
+- generatore multi-motore con scelta automatica GraphHopper → Valhalla/OpenStreetMap;
+- preferenze per sterrato, strade panoramiche, autostrade e pedaggi;
 - navigazione interna turn-by-turn con voce, GPS, fuori-percorso e ricalcolo;
 - registrazione GPS libera con statistiche e cronologia;
 - community dimostrativa, preferiti, pubblicazione predisposta;
@@ -24,13 +25,22 @@ Aprire `http://localhost:4173`. Il browser richiede un contesto sicuro per il GP
 
 ## Pubblicazione Netlify
 
-Collegare la cartella a un repository GitHub e importarla in Netlify. La configurazione usa Node.js 22 e pubblica la directory principale. La variabile opzionale `VALHALLA_URL` permette di indicare un server Valhalla dedicato.
+Collegare la cartella a un repository GitHub e importarla in Netlify. La configurazione usa Node.js 22 e pubblica la directory principale.
+
+Variabili facoltative:
+
+- `GRAPHHOPPER_API_KEY`: abilita GraphHopper senza esporre la chiave nel browser;
+- `GRAPHHOPPER_PROFILE`: profilo GraphHopper, predefinito `scooter`;
+- `GRAPHHOPPER_URL`: endpoint GraphHopper alternativo;
+- `VALHALLA_URL`: server Valhalla dedicato.
+
+Senza chiavi l’app continua a calcolare i percorsi tramite Valhalla/OpenStreetMap. Se GraphHopper è configurato ma non risponde, il passaggio a Valhalla è automatico. Kurviger richiede un accordo/API key dedicato e non viene simulato con dati falsi.
 
 ## Passaggi necessari prima della pubblicazione pubblica
 
 1. Collegare Firebase Authentication, Firestore e Storage per account e community reali.
 2. Attivare moderazione, segnalazione contenuti e regole Firestore.
-3. Usare un servizio Valhalla dedicato con quote e monitoraggio; il server pubblico è adatto solo allo sviluppo.
+3. Configurare GraphHopper oppure un servizio Valhalla dedicato con quote e monitoraggio; il server pubblico è adatto solo allo sviluppo.
 4. Integrare il servizio GPS nativo in background nei wrapper Android/iOS.
 5. Aggiungere termini, privacy, consenso alla posizione e flusso per cancellare l’account.
 

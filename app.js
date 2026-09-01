@@ -7,7 +7,7 @@ import {
 import {
   DEFAULT_CENTER,
   buildRoutePayload,
-  normalizeValhallaRoute,
+  normalizeRouteResponse,
   requestRoute,
 } from "./lib/route-service.js";
 
@@ -222,15 +222,20 @@ async function generateRoute(event) {
       avoidHighways: document.querySelector("#avoidHighways").checked,
       avoidTolls: document.querySelector("#avoidTolls").checked,
       routeKind: document.querySelector("#routeKind").value,
+      mode,
+      provider: document.querySelector("#routeProvider").value,
+      scenic: document.querySelector("#scenicRoute").checked,
     });
     const data = await requestRoute(payload, controller.signal);
-    runtime.activeRoute = normalizeValhallaRoute(data, mode);
+    runtime.activeRoute = normalizeRouteResponse(data, mode);
     runtime.activeRoute.difficulty = document.querySelector("input[name=difficulty]:checked").value;
     runtime.activeRoute.origin = origin;
     saveState();
     renderGeneratedRoute(runtime.activeRoute);
     drawRouteOnMainMap(runtime.activeRoute);
-    showToast("Percorso creato. Controlla sempre i divieti presenti sul posto.");
+    showToast(runtime.activeRoute.fallbackFrom
+      ? "GraphHopper non disponibile: percorso creato automaticamente con OpenStreetMap."
+      : "Percorso creato. Controlla sempre i divieti presenti sul posto.");
   } catch (error) {
     const message = error.name === "AbortError" ? "Il calcolo sta impiegando troppo tempo. Riprova con una distanza minore." : error.message;
     showRouteError(message);
@@ -417,9 +422,20 @@ async function rerouteFromCurrentPosition() {
   showToast("Ricalcolo del collegamento al percorso…");
   const destination = runtime.activeRoute.coordinates[Math.min(runtime.navigationRouteIndex + 180, runtime.activeRoute.coordinates.length - 1)];
   try {
-    const payload = buildRoutePayload({ origin: runtime.currentPosition, destination, distanceKm: 5, trailPreference: runtime.activeRoute.mode === "enduro" ? 70 : 0, avoidHighways: true, avoidTolls: true, routeKind: "oneway" });
+    const payload = buildRoutePayload({
+      origin: runtime.currentPosition,
+      destination,
+      distanceKm: 5,
+      trailPreference: runtime.activeRoute.mode === "enduro" ? 70 : 0,
+      avoidHighways: true,
+      avoidTolls: true,
+      routeKind: "oneway",
+      mode: runtime.activeRoute.mode,
+      provider: "auto",
+      scenic: false,
+    });
     const data = await requestRoute(payload);
-    const connector = normalizeValhallaRoute(data, runtime.activeRoute.mode);
+    const connector = normalizeRouteResponse(data, runtime.activeRoute.mode);
     runtime.activeRoute.coordinates = [...connector.coordinates, ...runtime.activeRoute.coordinates.slice(runtime.navigationRouteIndex + 180)];
     runtime.activeRoute.maneuvers = connector.maneuvers;
     startNavigation();

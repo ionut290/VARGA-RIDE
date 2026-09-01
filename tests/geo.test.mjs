@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildLoopWaypoints, decodePolyline, destinationPoint, haversineMeters, routeDistanceMeters } from "../lib/geo.js";
-import { buildRoutePayload } from "../lib/route-service.js";
+import { buildRoutePayload, normalizeGraphHopperRoute } from "../lib/route-service.js";
 
 test("haversine calcola una distanza realistica", () => {
   const bologna = [11.3426, 44.4949];
@@ -43,4 +43,18 @@ test("payload applica limiti e penalità sicurezza", () => {
   assert.equal(payload.costing_options.motorcycle.use_highways, 0);
   assert.equal(payload.costing_options.motorcycle.private_access_penalty, 3600);
   assert.equal(payload.locations.at(-1).lat, payload.locations[0].lat);
+});
+
+test("normalizza la risposta GraphHopper per la navigazione interna", () => {
+  const route = normalizeGraphHopperRoute({ paths: [{
+    distance: 12450,
+    time: 930000,
+    points: { coordinates: [[11.34, 44.49], [11.36, 44.51]] },
+    instructions: [{ sign: 2, text: "Svolta a destra", interval: [0, 1] }],
+  }] }, "road");
+  assert.equal(route.source, "GraphHopper / OpenStreetMap");
+  assert.equal(route.distanceKm, 12.45);
+  assert.equal(route.durationSeconds, 930);
+  assert.deepEqual(route.coordinates[1], [11.36, 44.51]);
+  assert.equal(route.maneuvers[0].type, 10);
 });
