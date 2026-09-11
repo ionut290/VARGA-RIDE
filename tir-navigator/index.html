@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="style.css" />
+  <title>TIR Navigator</title>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>TIR Navigator</h1>
+      <small id="status">Pronto</small>
+    </div>
+    <button id="installBtn" class="ghost" hidden>Installa</button>
+  </header>
+
+  <main>
+    <section class="card vehicle-card">
+      <div class="card-title-row">
+        <h2>Profilo TIR</h2>
+        <button id="toggleVehicle" class="ghost">Modifica</button>
+      </div>
+      <div id="vehicleForm" class="vehicle-grid">
+        <label>Peso totale (t)<input id="weight" type="number" step="0.1" value="40" /></label>
+        <label>Altezza (m)<input id="height" type="number" step="0.01" value="4.00" /></label>
+        <label>Larghezza (m)<input id="width" type="number" step="0.01" value="2.55" /></label>
+        <label>Lunghezza (m)<input id="length" type="number" step="0.1" value="16.5" /></label>
+        <label>Assi<input id="axles" type="number" step="1" value="5" /></label>
+        <label>Rimorchio
+          <select id="trailer"><option value="true" selected>Sì</option><option value="false">No</option></select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card route-card">
+      <h2>Navigazione</h2>
+      <div class="input-row">
+        <input id="destination" placeholder="Inserisci indirizzo o luogo" autocomplete="off" />
+        <button id="searchBtn">Cerca</button>
+      </div>
+      <div id="suggestions" class="suggestions"></div>
+      <div class="actions">
+        <button id="myPosBtn" class="secondary">📍 Mia posizione</button>
+        <button id="routeBtn" disabled>🚛 Calcola percorso TIR</button>
+      </div>
+      <div id="routeInfo" class="route-info"></div>
+      <div class="warning">
+        Il percorso TIR richiede una chiave HERE Routing API. Senza chiave l'app può mostrare la mappa e cercare luoghi, ma non deve essere usata per calcolare un itinerario camion affidabile.
+      </div>
+    </section>
+
+    <section class="map-wrap">
+      <div id="map"></div>
+      <button id="recenterBtn" class="map-fab">◎</button>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-tab="nav" class="active">🧭<span>Naviga</span></button>
+    <button data-tab="vehicle">🚛<span>Mezzo</span></button>
+    <button data-tab="saved">⭐<span>Preferiti</span></button>
+    <button data-tab="settings">⚙️<span>Impostazioni</span></button>
+  </nav>
+
+  <dialog id="settingsDialog">
+    <form method="dialog" class="dialog-card">
+      <h3>Impostazioni</h3>
+      <label>HERE API Key<input id="hereApiKey" type="password" placeholder="Incolla la chiave API" /></label>
+      <p class="help">La chiave resta salvata solo su questo dispositivo.</p>
+      <menu><button value="cancel" class="secondary">Chiudi</button><button id="saveSettings" value="default">Salva</button></menu>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>
